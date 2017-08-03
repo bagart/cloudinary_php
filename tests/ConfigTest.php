@@ -1,5 +1,5 @@
 <?php
-require_once './../src/Cloudinary.php';
+require_once __DIR__ . '/../src/Cloudinary.php';
 
 use PHPUnit\Framework\TestCase;
 

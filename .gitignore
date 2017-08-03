@@ -5,3 +5,4 @@ coverage/
 phpdocs/
 *.bak
 .idea
+composer.lock
