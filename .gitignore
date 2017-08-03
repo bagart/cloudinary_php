@@ -4,3 +4,4 @@ vendor/
 coverage/
 phpdocs/
 *.bak
+.idea
