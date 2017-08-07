@@ -2,16 +2,18 @@
 
 namespace Cloudinary {
 
+    use PHPUnit\Framework\TestCase;
+
     $base = realpath(dirname(__FILE__) . DIRECTORY_SEPARATOR . "..");
     require_once(join(DIRECTORY_SEPARATOR, array($base, "src", "Cloudinary.php")));
     require_once(join(DIRECTORY_SEPARATOR, array($base, "src", "Uploader.php")));
     require_once(join(DIRECTORY_SEPARATOR, array($base, "src", "Api.php")));
     require_once(join(DIRECTORY_SEPARATOR, array($base, "src", "Search.php")));
     require_once("TestHelper.php");
-    use PHPUnit_Framework_TestCase;
 
-    class SearchTest extends PHPUnit_Framework_TestCase
+    class SearchTest extends TestCase
     {
+        /** @var Search */
         public $search;
 
         public static function setUpBeforeClass()
@@ -126,7 +128,16 @@ namespace Cloudinary {
         public function test_execute_with_params()
         {
             Curl::mockApi($this);
-            $result = $this->search->expression("format:jpg")->max_results(10)->next_cursor("abcd")->sort_by("created_at", "asc")->sort_by("updated_at")->aggregate("format")->aggregate("resource_type")->with_field("tags")->with_field("image_metadata")->execute();
+            $this->search->expression("format:jpg")
+                ->max_results(10)
+                ->next_cursor("abcd")
+                ->sort_by("created_at", "asc")
+                ->sort_by("updated_at")
+                ->aggregate("format")
+                ->aggregate("resource_type")
+                ->with_field("tags")
+                ->with_field("image_metadata")
+                ->execute();
 
             assertJson($this, json_encode(array(
                 "sort_by" => array(
