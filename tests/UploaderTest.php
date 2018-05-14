@@ -1,7 +1,10 @@
 <?php
 
 namespace Cloudinary {
-
+    
+    ini_set('error_reporting', E_ALL); // or error_reporting(E_ALL);
+    ini_set('display_errors', '1');
+    ini_set('display_startup_errors', '1');
     $base = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR;
     require_once($base . 'Cloudinary.php');
     require_once($base . 'Uploader.php');
@@ -143,6 +146,9 @@ namespace Cloudinary {
         public function test_text()
         {
             $result = Uploader::text("hello world");
+            
+            $this->storePublicId($result["public_id"], $result["type"], $result["resource_type"]);
+            
             $this->assertGreaterThan(1, $result["width"]);
             $this->assertGreaterThan(1, $result["height"]);
         }
@@ -415,7 +421,8 @@ TAG
             );
             $this->assertEquals($resource["tags"], array("upload_large_tag"));
             $this->assertEquals($resource["resource_type"], "raw");
-
+            $this->storePublicId($resource["public_id"], $resource["type"], $resource["resource_type"]);
+            
             $resource = Uploader::upload_large(
                 $temp_file_name,
                 array("chunk_size" => 5243000, "tags" => array("upload_large_tag"), "resource_type" => "image")
@@ -424,7 +431,8 @@ TAG
             $this->assertEquals($resource["resource_type"], "image");
             $this->assertEquals($resource["width"], 1400);
             $this->assertEquals($resource["height"], 1400);
-
+            $this->storePublicId($resource["public_id"], $resource["type"], $resource["resource_type"]);
+            
             #where chunk size equals file size
             $resource = Uploader::upload_large(
                 $temp_file_name,
@@ -434,6 +442,7 @@ TAG
             $this->assertEquals($resource["resource_type"], "image");
             $this->assertEquals($resource["width"], 1400);
             $this->assertEquals($resource["height"], 1400);
+            $this->storePublicId($resource["public_id"], $resource["type"], $resource["resource_type"]);
         }
 
         public function test_upload_large_url()

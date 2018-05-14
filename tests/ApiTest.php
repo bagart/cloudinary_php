@@ -7,6 +7,7 @@ namespace Cloudinary {
     require_once($base . 'Uploader.php');
     require_once($base . 'Api.php');
     require_once('TestHelper.php');
+    require_once __DIR__ . '/IntegrationTestBase.php';
 
     use Cloudinary;
     use Exception;
@@ -15,7 +16,7 @@ namespace Cloudinary {
      * Class ApiTest
      * @package Cloudinary
      */
-    class ApiTest extends \PHPUnit\Framework\TestCase
+	class ApiTest extends IntegrationTestBase
     {
         protected static $api_test_tag = "cloudinary_php_test";
         protected static $initialized = false;
@@ -93,11 +94,6 @@ namespace Cloudinary {
 
             self::$streaming_profile_1 = self::$api_test . "_streaming_profile_1";
             self::$streaming_profile_2 = self::$api_test . "_streaming_profile_2";
-        }
-
-        public function tearDown()
-        {
-            Curl::$instance = new Curl();
         }
 
         public static function tearDownAfterClass()
@@ -778,7 +774,7 @@ namespace Cloudinary {
          */
         public function test20_manual_moderation()
         {
-            $resource = Uploader::upload(TEST_IMG, array("moderation" => "manual"));
+            $resource = Uploader::upload(TEST_IMG, array("moderation" => "manual", "tags" => self::TEST_TAG));
             $this->assertEquals($resource["moderation"][0]["status"], "pending");
             $this->assertEquals($resource["moderation"][0]["kind"], "manual");
 
@@ -798,6 +794,7 @@ namespace Cloudinary {
         public function test22_raw_conversion()
         {
             $resource = Uploader::upload(RAW_FILE, array("resource_type" => "raw"));
+            $this->storePublicId($resource["public_id"], $resource["type"], $resource["resource_type"]);
             $this->api->update($resource["public_id"], array("raw_convert" => "illegal", "resource_type" => "raw"));
         }
 
