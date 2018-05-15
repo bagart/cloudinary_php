@@ -5,6 +5,9 @@ use \PHPUnit\Framework\TestCase;
 
 use \Cloudinary\Api;
 
+/**
+ * Integration Test Base Class
+ */
 class IntegrationTestBase extends TestCase
 {
     const TEST_TAG = 'php_test';
@@ -19,23 +22,39 @@ class IntegrationTestBase extends TestCase
     const RESOURCE_TYPE_RAW = 'raw';
     const RESOURCE_TYPE_VIDEO = 'video';
     
-    private $publicIds = [];
+    private static $storedPublicIds = [];
+    private static $storedTransformationData = [];
+    private static $storedTags = [];
     
+    /**
+     * @inheritdoc
+     */
     public function tearDown()
     {
         Curl::$instance = new Curl();
-        $api_key = \Cloudinary::option_get([], "api_key", \Cloudinary::config_get("api_key"));
-        if ($api_key != self::API_KEY_WRONG) {
-            $api = new Api();
-            $api->delete_resources_by_tag(self::TEST_TAG);
-        }
-        
-        $this->deleteContentByStorePublicId();
-        
-        Curl::$instance = new Curl();
     }
     
-    public static function getContentTypeList()
+    /**
+     * @inheritdoc
+     */
+    public static function tearDownAfterClass()
+    {
+        self::storeTag(self::TEST_TAG);
+        
+        $api_key = \Cloudinary::option_get([], "api_key", \Cloudinary::config_get("api_key"));
+        if ($api_key != self::API_KEY_WRONG) {
+            self::deleteResourcesByStoredTags();
+            self::deleteContentByStoredPublicId();
+            self::deleteTransformationsByStoredData();
+        }
+    }
+    
+    /**
+     * Content Type List
+     * 
+     * @return array
+     */
+    protected static function getContentTypeList()
     {
         return array(
             self::CONTENT_TYPE_TEXT,
@@ -45,7 +64,12 @@ class IntegrationTestBase extends TestCase
         );
     }
     
-    public static function getContentResourceTypeList()
+    /**
+     * Content Resource Type List
+     * 
+     * @return array
+     */
+    protected static function getContentResourceTypeList()
     {
         return array(
             self::RESOURCE_TYPE_IMAGE,
@@ -54,21 +78,91 @@ class IntegrationTestBase extends TestCase
         );
     }
     
-    public function storePublicId($id, $type, $resource_type)
+    /**
+     * Save PublicId
+     * 
+     * @param string $id
+     * @param string $type
+     * @param string $resource_type
+     * 
+     * @return void
+     */
+    protected static function storePublicId($id, $type, $resource_type)
     {
         if (in_array($type, self::getContentTypeList()) && in_array($resource_type, self::getContentResourceTypeList())) {
-            $this->publicIds[$type][$resource_type][] = $id;
+            self::$storedPublicIds[$type][$resource_type][] = $id;
         }
     }
     
-    public function deleteContentByStorePublicId()
+    /**
+     * Delete content by store PublicId
+     * 
+     * @return void
+     */
+    protected static function deleteContentByStoredPublicId()
     {
-        foreach ($this->publicIds as $type => $resources) {
+        foreach (self::$storedPublicIds as $type => $resources) {
             foreach ($resources as $resource_type => $publicIds) {
                 foreach ($publicIds as $publicId) {
                     Uploader::destroy($publicId, array("type" => $type, "resource_type" => $resource_type));
                 }
             }
+        }
+    }
+    
+    /**
+     * Save transformations data
+     * 
+     * @param array $transformationData
+     * 
+     * @return void
+     */
+    protected static function storeTransformationData(array $transformationData)
+    {
+        if (!empty($transformationData)) {
+            self::$storedTransformationData[md5(json_encode($transformationData))] = $transformationData;
+        }
+    }
+    
+    /**
+     * Delete Transformations by store data
+     * 
+     * @return void
+     */
+    protected static function deleteTransformationsByStoredData()
+    {
+        $api = new Api();
+        foreach (self::$storedTransformationData as $transformationData) {
+            try {
+                $api->delete_transformation($transformationData);
+            } catch (\Cloudinary\Api\NotFound $e) {}
+        }
+    }
+    
+    /**
+     * Save tag
+     * 
+     * @param string $tag
+     * 
+     * @return void
+     */
+    protected static function storeTag($tag)
+    {
+        if (!empty($tag)) {
+            self::$storedTags[md5($tag)] = $tag;
+        }
+    }
+    
+    /**
+     * Delete resources by store tags
+     * 
+     * @return void
+     */
+    protected static function deleteResourcesByStoredTags()
+    {
+        $api = new Api();
+        foreach (self::$storedTags as $tag) {
+            $api->delete_resources_by_tag($tag);
         }
     }
 }

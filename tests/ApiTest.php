@@ -94,6 +94,9 @@ namespace Cloudinary {
 
             self::$streaming_profile_1 = self::$api_test . "_streaming_profile_1";
             self::$streaming_profile_2 = self::$api_test . "_streaming_profile_2";
+            
+            self::storeTransformationData(self::$crop_transformation);
+            self::storeTransformationData(self::$scale_transformation);
         }
 
         public static function tearDownAfterClass()
@@ -108,6 +111,14 @@ namespace Cloudinary {
             self::delete_transformations($api);
             self::delete_presets($api);
             self::delete_streaming_profiles($api);
+            self::storeTag(self::TEST_TAG);
+            
+            $api_key = \Cloudinary::option_get([], "api_key", \Cloudinary::config_get("api_key"));
+            if ($api_key != self::API_KEY_WRONG) {
+                self::deleteResourcesByStoredTags();
+                self::deleteContentByStoredPublicId();
+                self::deleteTransformationsByStoredData();
+            }
         }
 
 
@@ -590,7 +601,8 @@ namespace Cloudinary {
                 TEST_IMG,
                 array(
                     "public_id" => self::$api_test_4,
-                    "eager" => array("transformation" => self::$scale_transformation)
+                    "eager" => array("transformation" => self::$scale_transformation),
+                    "tags" => self::TEST_TAG
                 )
             );
 
@@ -794,7 +806,7 @@ namespace Cloudinary {
         public function test22_raw_conversion()
         {
             $resource = Uploader::upload(RAW_FILE, array("resource_type" => "raw"));
-            $this->storePublicId($resource["public_id"], $resource["type"], $resource["resource_type"]);
+            self::storePublicId($resource["public_id"], $resource["type"], $resource["resource_type"]);
             $this->api->update($resource["public_id"], array("raw_convert" => "illegal", "resource_type" => "raw"));
         }
 

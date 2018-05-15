@@ -7,10 +7,9 @@ namespace Cloudinary {
     require_once(join(DIRECTORY_SEPARATOR, array($base, 'src', 'Uploader.php')));
     require_once(join(DIRECTORY_SEPARATOR, array($base, 'src', 'Api.php')));
     require_once('TestHelper.php');
+    require_once('IntegrationTestBase.php');
 
-    use PHPUnit\Framework\TestCase;
-
-    class ArchiveTest extends TestCase
+    class ArchiveTest extends IntegrationTestBase
     {
         public static function setUpBeforeClass()
         {
@@ -39,12 +38,14 @@ namespace Cloudinary {
         public function test_create_zip()
         {
             $result = Uploader::create_zip(array("tags" => $this->tag));
+            self::storePublicId($result["public_id"], $result["type"], $result["resource_type"]);
             $this->assertEquals(2, $result["file_count"]);
         }
 
         public function test_expires_at()
         {
-            Uploader::create_zip(array("tags" => $this->tag, "expires_at" => time() + 3600));
+            $result = Uploader::create_zip(array("tags" => $this->tag, "expires_at" => time() + 3600));
+            self::storePublicId($result["public_id"], $result["type"], $result["resource_type"]);
             assertUrl($this, '/image/generate_archive');
             assertParam($this, "target_format", "zip");
             assertParam($this, "tags[0]", $this->tag);

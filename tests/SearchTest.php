@@ -8,10 +8,9 @@ namespace Cloudinary {
     require_once(join(DIRECTORY_SEPARATOR, array($base, "src", "Api.php")));
     require_once(join(DIRECTORY_SEPARATOR, array($base, "src", "Search.php")));
     require_once("TestHelper.php");
+    require_once('IntegrationTestBase.php');
 
-    use PHPUnit\Framework\TestCase;
-
-    class SearchTest extends TestCase
+    class SearchTest extends IntegrationTestBase
     {
         public $search;
 
@@ -19,6 +18,9 @@ namespace Cloudinary {
         {
             Curl::$instance = new Curl();
             \Cloudinary::reset_config();
+            
+            $transformation = array("width" => 100, "crop" => "scale");
+            
             foreach (range(1, 3) as $i) {
                 Uploader::upload(
                     TEST_IMG,
@@ -27,15 +29,15 @@ namespace Cloudinary {
                         "tags" => array(TEST_TAG, UNIQUE_TEST_TAG),
                         "context" => "stage=value",
                         "eager" => array(
-                            "transformation" => array(
-                                "width" => 100,
-                                "crop" => "scale",
-                            ),
-                        ),
+                            "transformation" => $transformation
+                        )
                     )
                 );
             }
             sleep(3);
+            
+            self::storeTransformationData($transformation);
+            self::storeTag(UNIQUE_TEST_TAG);
         }
 
         public function setUp()
@@ -50,12 +52,6 @@ namespace Cloudinary {
         public function tearDown()
         {
             Curl::$instance = new Curl();
-        }
-
-        public static function tearDownAfterClass()
-        {
-            Curl::$instance = new Curl();
-            (new Api())->delete_resources_by_tag(UNIQUE_TEST_TAG);
         }
 
         public function test_empty_query()
