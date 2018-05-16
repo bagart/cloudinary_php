@@ -191,7 +191,7 @@ namespace Cloudinary {
         public function test_remove_all_tags()
         {
             Curl::mockUpload($this);
-            $public_id = UNIQUE_TEST_ID;
+            $public_id = UNIQUE_TEST_TAG;
             Uploader::remove_all_tags($public_id);
             assertPost($this);
             assertUrl($this, '/image/tags');
