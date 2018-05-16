@@ -22,7 +22,7 @@ namespace Cloudinary {
             if (!\Cloudinary::config_get("api_secret")) {
                 $this->markTestSkipped('Please setup environment for Upload test to run');
             }
-            $this->tag = "php_test_" . rand(11111, 99999);
+            $this->tag = UNIQUE_TEST_TAG."_archive";
 
             Uploader::upload("tests/logo.png", array("tags" => array($this->tag)));
             Uploader::upload("tests/logo.png", array("tags" => array($this->tag), "width" => 10, "crop" => "scale"));

@@ -111,7 +111,7 @@ namespace Cloudinary {
             self::delete_transformations($api);
             self::delete_presets($api);
             self::delete_streaming_profiles($api);
-            self::storeTag(self::TEST_TAG);
+            self::storeTag(UNIQUE_TEST_TAG);
             
             $api_key = \Cloudinary::option_get([], "api_key", \Cloudinary::config_get("api_key"));
             if ($api_key != self::API_KEY_WRONG) {
@@ -437,7 +437,7 @@ namespace Cloudinary {
          */
         public function test08a_delete_derived_by_transformation()
         {
-            $public_id = "public_id";
+            $public_id = UNIQUE_TEST_TAG."_public_id";
             Curl::mockApi($this);
             $this->api->delete_derived_by_transformation($public_id, self::$crop_transformation);
             assertUrl($this, "/resources/image/upload");
@@ -602,7 +602,7 @@ namespace Cloudinary {
                 array(
                     "public_id" => self::$api_test_4,
                     "eager" => array("transformation" => self::$scale_transformation),
-                    "tags" => self::TEST_TAG
+                    "tags" => UNIQUE_TEST_TAG
                 )
             );
 
@@ -786,7 +786,7 @@ namespace Cloudinary {
          */
         public function test20_manual_moderation()
         {
-            $resource = Uploader::upload(TEST_IMG, array("moderation" => "manual", "tags" => self::TEST_TAG));
+            $resource = Uploader::upload(TEST_IMG, array("moderation" => "manual", "tags" => UNIQUE_TEST_TAG));
             $this->assertEquals($resource["moderation"][0]["status"], "pending");
             $this->assertEquals($resource["moderation"][0]["kind"], "manual");
 
@@ -1006,10 +1006,16 @@ namespace Cloudinary {
                                    "in the Upload Settings, and the account should be empty of folders. " .
                                    "Comment out this line if you really want to test it.");
 
-            Uploader::upload(TEST_IMG, array("public_id" => "test_folder1/item"));
-            Uploader::upload(TEST_IMG, array("public_id" => "test_folder2/item"));
-            Uploader::upload(TEST_IMG, array("public_id" => "test_folder1/test_subfolder1/item"));
-            Uploader::upload(TEST_IMG, array("public_id" => "test_folder1/test_subfolder2/item"));
+            Uploader::upload(TEST_IMG, array("public_id" => "test_folder1/item".SUFFIX, "tags" => UNIQUE_TEST_TAG));
+            Uploader::upload(TEST_IMG, array("public_id" => "test_folder2/item".SUFFIX, "tags" => UNIQUE_TEST_TAG));
+            Uploader::upload(TEST_IMG, array(
+                "public_id" => "test_folder1/test_subfolder1/item" . SUFFIX,
+                "tags" => UNIQUE_TEST_TAG
+            ));
+            Uploader::upload(TEST_IMG, array(
+                "public_id" => "test_folder1/test_subfolder2/item" . SUFFIX,
+                "tags" => UNIQUE_TEST_TAG
+            ));
             $result = $this->api->root_folders();
             $this->assertContains(array("name" => "test_folder1", "path" => "test_folder1"), $result["folders"]);
             $this->assertContains(array("name" => "test_folder2", "path" => "test_folder2"), $result["folders"]);

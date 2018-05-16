@@ -10,7 +10,6 @@ use \Cloudinary\Api;
  */
 class IntegrationTestBase extends TestCase
 {
-    const TEST_TAG = 'php_test';
     const API_KEY_WRONG = '1234';
     
     const CONTENT_TYPE_TEXT = 'text';
@@ -39,7 +38,7 @@ class IntegrationTestBase extends TestCase
      */
     public static function tearDownAfterClass()
     {
-        self::storeTag(self::TEST_TAG);
+        self::storeTag(UNIQUE_TEST_TAG);
         
         $api_key = \Cloudinary::option_get([], "api_key", \Cloudinary::config_get("api_key"));
         if ($api_key != self::API_KEY_WRONG) {
