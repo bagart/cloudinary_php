@@ -381,7 +381,6 @@ TAG
         public function test_raw_conversion()
         {
             // should support requesting raw_convert
-            self::setExpectedException(Cloudinary\Error::class);
             Uploader::upload("tests/docx.docx", array("resource_type" => "raw", "raw_convert" => "illegal"));
         }
 
@@ -392,7 +391,6 @@ TAG
         public function test_categorization()
         {
             // should support requesting categorization
-            self::setExpectedException(Cloudinary\Error::class);
             Uploader::upload(TEST_IMG, array("categorization" => "illegal"));
         }
 
@@ -403,7 +401,6 @@ TAG
         public function test_detection()
         {
             // should support requesting detection
-            self::setExpectedException(Cloudinary\Error::class);
             Uploader::upload(TEST_IMG, array("detection" => "illegal"));
         }
 
@@ -414,7 +411,6 @@ TAG
         public function test_background_removal()
         {
             // should support requesting background_removal
-            self::setExpectedException(Cloudinary\Error::class);
             Uploader::upload(TEST_IMG, array("background_removal" => "illegal"));
         }
 
