@@ -583,5 +583,44 @@ TAG
                 }
             }
         }
+
+        /**
+         * Should supported the flag "format" in breakpoints transformation
+         */
+        public function test_flag_format_in_breakpoints_transformation()
+        {
+            $result = Uploader::upload(TEST_IMG, array(
+                "tags" => UNIQUE_TEST_TAG,
+                "public_id" => "multi_page_sample_qi2pad",
+                "responsive_breakpoints" => array(
+                    "create_derived" => true,
+                    "transformation" => array(
+                        "angle" => 90
+                    ),
+                    "format" => 'jpg'
+                )
+            ));
+            $this->assertNotNull($result["responsive_breakpoints"]);
+            $this->assertEquals($result["responsive_breakpoints"][0]["transformation"], "a_90");
+            $this->assertRegExp('/\.jpg$/', $result["responsive_breakpoints"][0]["breakpoints"][0]["url"]);
+
+            $result = Uploader::explicit("multi_page_sample_qi2pad", array(
+                "type" => "upload",
+                "responsive_breakpoints" => array(
+                    "transformation" => array(
+                        "page" => 1,
+                        "format" => "jpg"
+                    ),
+                    "create_derived" => true,
+                    "bytes_step" => 20000,
+                    ":min_width" => 200,
+                    ":max_width" => 1000,
+                    ":max_images" => 20
+                )
+            ));
+
+            $this->assertNotNull($result["responsive_breakpoints"]);
+            $this->assertRegExp('/\.jpg$/', $result["responsive_breakpoints"][0]["breakpoints"][0]["url"]);
+        }
     }
 }

@@ -445,6 +445,9 @@ namespace Cloudinary {
                 if ($breakpoint_settings) {
                     $transformation = \Cloudinary::option_consume($breakpoint_settings, "transformation");
                     if ($transformation) {
+                        $transformation = array_merge(array(
+                            "fetch_format" => \Cloudinary::option_get($transformation, "format")
+                        ), $transformation);
                         $breakpoint_settings["transformation"] = \Cloudinary::generate_transformation_string(
                             $transformation
                         );
