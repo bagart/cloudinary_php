@@ -585,9 +585,9 @@ TAG
         }
 
         /**
-         * Should supported the flag "format" in breakpoints transformation
+         * Should allow to sets the file extension of the derived resources to the format indicated
          */
-        public function test_flag_format_in_breakpoints_transformation()
+        public function test_parameter_format_in_responsive_breakpoints()
         {
             $result = Uploader::upload(TEST_IMG, array(
                 "tags" => UNIQUE_TEST_TAG,
@@ -609,8 +609,8 @@ TAG
                 "responsive_breakpoints" => array(
                     "transformation" => array(
                         "page" => 1,
-                        "format" => "jpg"
                     ),
+                    "format" => "jpg",
                     "create_derived" => true,
                     "bytes_step" => 20000,
                     ":min_width" => 200,
