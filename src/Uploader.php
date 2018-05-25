@@ -123,7 +123,11 @@ namespace Cloudinary {
                 try {
                     $upload = Uploader::upload_large_part(
                         $temp_file_name,
-                        array_merge($options, array("public_id" => $public_id, "content_range" => $range, "x_unique_upload_id" => $upload_id))
+                        array_merge($options, array(
+                            "public_id" => $public_id,
+                            "content_range" => $range,
+                            "x_unique_upload_id" => $upload_id
+                        ))
                     );
                 } catch (\Exception $e) {
                     unlink($temp_file_name);

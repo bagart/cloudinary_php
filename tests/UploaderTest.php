@@ -433,6 +433,7 @@ TAG
             );
             $this->assertEquals($resource["tags"], array("upload_large_tag"));
             $this->assertEquals($resource["resource_type"], "raw");
+            $this->assertContains('X-Unique-Upload-Id: ', implode("", Curl::$instance->getopt(CURLOPT_HTTPHEADER)));
 
             $resource = Uploader::upload_large(
                 $temp_file_name,
@@ -442,6 +443,7 @@ TAG
             $this->assertEquals($resource["resource_type"], "image");
             $this->assertEquals($resource["width"], 1400);
             $this->assertEquals($resource["height"], 1400);
+            $this->assertContains('X-Unique-Upload-Id: ', implode("", Curl::$instance->getopt(CURLOPT_HTTPHEADER)));
 
             #where chunk size equals file size
             $resource = Uploader::upload_large(
@@ -452,6 +454,7 @@ TAG
             $this->assertEquals($resource["resource_type"], "image");
             $this->assertEquals($resource["width"], 1400);
             $this->assertEquals($resource["height"], 1400);
+            $this->assertContains('X-Unique-Upload-Id: ', implode("", Curl::$instance->getopt(CURLOPT_HTTPHEADER)));
         }
 
         public function test_upload_large_url()
