@@ -108,13 +108,14 @@ class MetadataTest extends TestCase
      */
     private function assert_metadata_field($metadataField, $type = null)
     {
+        $this->assertNotEmpty($metadataField['external_id']);
         if ($type) {
             $this->assertEquals($type, $metadataField['type']);
+        } else {
+            $this->assertContains($metadataField['type'], ['string', 'integer', 'date', 'enum', 'set']);
         }
-        $this->assertNotEmpty($metadataField['type']);
-        $this->assertNotEmpty($metadataField['external_id']);
-        $this->assertNotEmpty($metadataField['label']);
-        $this->assertArrayHasKey('mandatory', $metadataField);
+        $this->assertInternalType('string', $metadataField['label']);
+        $this->assertInternalType('boolean', $metadataField['mandatory']);
         $this->assertArrayHasKey('default_value', $metadataField);
         $this->assertArrayHasKey('validation', $metadataField);
         if (in_array($metadataField['type'], ['enum', 'set'])) {
