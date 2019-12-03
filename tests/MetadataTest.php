@@ -51,15 +51,14 @@ class MetadataTest extends TestCase
         if (!Cloudinary::config_get("api_secret")) {
             self::markTestSkipped('Please setup environment for Api test to run');
         }
-        self::$unique_external_id_general = 'general-' . UNIQUE_TEST_TAG;
-        self::$unique_external_id_string = 'string-' . UNIQUE_TEST_TAG;
-        self::$unique_external_id_int = 'int-' . UNIQUE_TEST_TAG;
-        self::$unique_external_id_date = 'date-' . UNIQUE_TEST_TAG;
-        self::$unique_external_id_enum = 'enum-' . UNIQUE_TEST_TAG;
-        self::$unique_external_id_enum_2 = 'enum-2-' . UNIQUE_TEST_TAG;
-        self::$unique_external_id_set = 'set-' . UNIQUE_TEST_TAG;
-        self::$unique_external_id_set_2 = 'set-2' . UNIQUE_TEST_TAG;
-
+        self::$unique_external_id_general = 'metadata_external_id_general_' . UNIQUE_TEST_TAG;
+        self::$unique_external_id_string = 'metadata_external_id_string_' . UNIQUE_TEST_TAG;
+        self::$unique_external_id_int = 'metadata_external_id_int_' . UNIQUE_TEST_TAG;
+        self::$unique_external_id_date = 'metadata_external_id_date_' . UNIQUE_TEST_TAG;
+        self::$unique_external_id_enum = 'metadata_external_id_enum_' . UNIQUE_TEST_TAG;
+        self::$unique_external_id_enum_2 = 'metadata_external_id_enum_2_' . UNIQUE_TEST_TAG;
+        self::$unique_external_id_set = 'metadata_external_id_set_' . UNIQUE_TEST_TAG;
+        self::$unique_external_id_set_2 = 'metadata_external_id_set_2_' . UNIQUE_TEST_TAG;
         try {
             (new Api())->add_metadata_field([
                 'external_id' => self::$unique_external_id_general,
