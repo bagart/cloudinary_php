@@ -100,8 +100,6 @@ class MetadataTest extends TestCase
                 $e->getMessage()
             );
         }
-
-        $api->delete_resources_by_tag(UNIQUE_TEST_TAG);
     }
 
     /**
