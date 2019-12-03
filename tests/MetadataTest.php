@@ -103,20 +103,6 @@ class MetadataTest extends TestCase
     }
 
     /**
-     * Reports an error if the $haystack array does not contain the $needle array.
-     * @param array $haystack
-     * @param array $needle
-     */
-    protected static function assert_array_contains_array($haystack, $needle)
-    {
-        $result = array_filter($haystack, function ($item) use ($needle) {
-            return $item == $needle;
-        });
-
-        self::assertGreaterThanOrEqual(1, count($result), 'The $haystack array does not contain the $needle array');
-    }
-
-    /**
      * @param $metadataField
      * @param string $type
      */
@@ -327,7 +313,7 @@ class MetadataTest extends TestCase
         );
 
         $this->assert_metadata_field_datasource($result);
-        $this->assert_array_contains_array($result['values'], self::$datasource_single[0]);
+        assertArrayContainsArray($this, $result['values'], self::$datasource_single[0]);
         $this->assertCount(count(self::$datasource_multiple), $result['values']);
         $this->assertEquals(self::$datasource_single[0]['value'], $result['values'][0]['value']);
     }
