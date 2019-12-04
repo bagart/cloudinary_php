@@ -22,6 +22,7 @@ class MetadataTest extends TestCase
     private static $unique_external_id_enum_2;
     private static $unique_external_id_set;
     private static $unique_external_id_set_2;
+    private static $unique_external_id_for_deletion;
     private static $datasource_single = [
         [
             'value' => 'v1',
@@ -59,6 +60,7 @@ class MetadataTest extends TestCase
         self::$unique_external_id_enum_2 = 'metadata_external_id_enum_2_' . UNIQUE_TEST_TAG;
         self::$unique_external_id_set = 'metadata_external_id_set_' . UNIQUE_TEST_TAG;
         self::$unique_external_id_set_2 = 'metadata_external_id_set_2_' . UNIQUE_TEST_TAG;
+        self::$unique_external_id_for_deletion = 'metadata_deletion_test_' . UNIQUE_TEST_TAG;
         try {
             (new Api())->add_metadata_field([
                 'external_id' => self::$unique_external_id_general,
@@ -80,6 +82,11 @@ class MetadataTest extends TestCase
                 'external_id' => self::$unique_external_id_set_2,
                 'label' => self::$unique_external_id_set_2,
                 'type' => 'set'
+            ]);
+            (new Api())->add_metadata_field([
+                'external_id' => self::$unique_external_id_for_deletion,
+                'label' => self::$unique_external_id_for_deletion,
+                'type' => 'integer'
             ]);
         } catch (Exception $e) {
             self::fail(
@@ -112,6 +119,25 @@ class MetadataTest extends TestCase
                 'Exception thrown while deleting metadata fields in MetadataFieldsTest::tearDownAfterClass() - ' .
                 $e->getMessage()
             );
+        }
+        self::delete_extra_metadata_fields($api);
+    }
+
+    /**
+     * Delete leftover metadata fields which should have been deleted in case something broke and they were not deleted
+     *
+     * @param \Cloudinary\Api $api
+     */
+    private static function delete_extra_metadata_fields($api)
+    {
+        $externalIds = array(
+            self::$unique_external_id_for_deletion,
+        );
+        foreach ($externalIds as $externalId) {
+            try {
+                $api->delete_metadata_field($externalId);
+            } catch (Exception $e) {
+            }
         }
     }
 
@@ -343,23 +369,15 @@ class MetadataTest extends TestCase
     }
 
     /**
-     * Delete a metadata field by external id
+     * Deletes a metadata field definition by its external id.
+     * The field should no longer be considered a valid candidate for all other endpoints (it will not show up in the
+     * list of fields, etc).
      *
      * @throws \Cloudinary\Api\GeneralError
      */
     public function test_delete_metadata_field()
     {
-        $tempMetadataFieldId = 'deletion-' . self::$unique_external_id_int;
-
-        $result = $this->api->add_metadata_field([
-            'external_id' => $tempMetadataFieldId,
-            'label' => $tempMetadataFieldId,
-            'type' => 'integer'
-        ]);
-
-        $this->assert_metadata_field($result, 'integer');
-
-        $this->api->delete_metadata_field($tempMetadataFieldId);
+        $this->api->delete_metadata_field(self::$unique_external_id_for_deletion);
 
         $hasException = false;
         try {
