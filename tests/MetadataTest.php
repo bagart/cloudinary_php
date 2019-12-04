@@ -23,6 +23,10 @@ class MetadataTest extends TestCase
     private static $unique_external_id_set;
     private static $unique_external_id_set_2;
     private static $unique_external_id_for_deletion;
+    private static $unique_external_id_for_testing_date_validation;
+    private static $unique_external_id_for_testing_date_validation_2;
+    private static $unique_external_id_for_testing_integer_validation;
+    private static $unique_external_id_for_testing_integer_validation_2;
     private static $datasource_single = [
         [
             'value' => 'v1',
@@ -61,6 +65,10 @@ class MetadataTest extends TestCase
         self::$unique_external_id_set = 'metadata_external_id_set_' . UNIQUE_TEST_TAG;
         self::$unique_external_id_set_2 = 'metadata_external_id_set_2_' . UNIQUE_TEST_TAG;
         self::$unique_external_id_for_deletion = 'metadata_deletion_test_' . UNIQUE_TEST_TAG;
+        self::$unique_external_id_for_testing_date_validation = 'metadata_date_validation_test_' . UNIQUE_TEST_TAG;
+        self::$unique_external_id_for_testing_date_validation_2 = 'metadata_date_validation_test_2_' . UNIQUE_TEST_TAG;
+        self::$unique_external_id_for_testing_integer_validation = 'metadata_integer_validation_test_' . UNIQUE_TEST_TAG;
+        self::$unique_external_id_for_testing_integer_validation_2 = 'metadata_integer_validation_test_2_' . UNIQUE_TEST_TAG;
         try {
             (new Api())->add_metadata_field([
                 'external_id' => self::$unique_external_id_general,
@@ -114,6 +122,8 @@ class MetadataTest extends TestCase
             $api->delete_metadata_field(self::$unique_external_id_enum_2);
             $api->delete_metadata_field(self::$unique_external_id_set);
             $api->delete_metadata_field(self::$unique_external_id_set_2);
+            $api->delete_metadata_field(self::$unique_external_id_for_testing_date_validation);
+            $api->delete_metadata_field(self::$unique_external_id_for_testing_integer_validation);
         } catch (Exception $e) {
             self::fail(
                 'Exception thrown while deleting metadata fields in MetadataFieldsTest::tearDownAfterClass() - ' .
@@ -132,6 +142,8 @@ class MetadataTest extends TestCase
     {
         $externalIds = array(
             self::$unique_external_id_for_deletion,
+            self::$unique_external_id_for_testing_date_validation_2,
+            self::$unique_external_id_for_testing_integer_validation_2,
         );
         foreach ($externalIds as $externalId) {
             try {
@@ -413,57 +425,74 @@ class MetadataTest extends TestCase
      */
     public function test_date_field_default_value_validation()
     {
-        $validation = [
+        $pastDate = date('Y-m-d', time() - 60 * 60 * 24 * 3);
+        $yesterdaydate = date('Y-m-d', time() - 60 * 60 * 24);
+        $todayDate = date('Y-m-d');
+        $futureDate = date('Y-m-d', time() + 60 * 60 * 24 * 3);
+        $lastThreeDaysValidation = [
             'rules' => [
                 [
                     'type' => 'greater_than',
                     'equals' => false,
-                    'value' => date('Y-m-d', time() - 60*60*24*3)
+                    'value' => $pastDate
                 ],
                 [
                     'type' => 'less_than',
                     'equals' => false,
-                    'value' => date('Y-m-d')
+                    'value' => $todayDate
                 ],
             ],
             'type' => 'and'
         ];
-        $metadata_field = [
-            'label' => 'date-validation-' . self::$unique_external_id_date,
-            'type' => 'date',
-            'default_value' => date('Y-m-d', time() - 60*60*24),
-            'validation' => $validation
-        ];
 
+        // Test entering a metadata field with date validation and a valid default value
+        $metadata_field = [
+            'external_id' => self::$unique_external_id_for_testing_date_validation,
+            'label' => self::$unique_external_id_for_testing_date_validation,
+            'type' => 'date',
+            'default_value' => $yesterdaydate,
+            'validation' => $lastThreeDaysValidation
+        ];
         $result = $this->api->add_metadata_field($metadata_field);
 
         $this->assert_metadata_field($result, 'date', [
-            'validation' => $validation,
+            'validation' => $lastThreeDaysValidation,
             'default_value' => $metadata_field['default_value'],
         ]);
 
-        $this->api->delete_metadata_field($result['external_id']);
-
+        // Test entering a metadata field with date validation and an invalid default value
+        $metadata_field = [
+            'external_id' => self::$unique_external_id_for_testing_date_validation_2,
+            'label' => self::$unique_external_id_for_testing_date_validation_2,
+            'type' => 'date',
+            'default_value' => $futureDate,
+            'validation' => $lastThreeDaysValidation
+        ];
         $this->setExpectedException('\Cloudinary\Api\BadRequest');
-        $metadata_field['default_value'] = date('Y-m-d', time() + 60*60*24*3);
         $this->api->add_metadata_field($metadata_field);
     }
 
     /**
-     * Test integer field single validation
+     * Test integer field validation
      *
      * @throws \Cloudinary\Api\GeneralError
      */
-    public function test_integer_field_single_validation()
+    public function test_integer_field_validation()
     {
-        $validation = ['type' => 'less_than', 'equals' => true, 'value' => 5];
+        $validation = [
+            'type' => 'less_than',
+            'equals' => true,
+            'value' => 5
+        ];
+
+        // Test entering a metadata field with integer validation and a valid default value
         $metadata_field = [
-            'label' => 'validation-' . self::$unique_external_id_int,
+            'external_id' => self::$unique_external_id_for_testing_integer_validation,
+            'label' => self::$unique_external_id_for_testing_integer_validation,
             'type' => 'integer',
             'default_value' => 5,
             'validation' => $validation
         ];
-
         $result = $this->api->add_metadata_field($metadata_field);
 
         $this->assert_metadata_field($result, 'integer', [
@@ -471,10 +500,15 @@ class MetadataTest extends TestCase
             'default_value' => $metadata_field['default_value'],
         ]);
 
-        $this->api->delete_metadata_field($result['external_id']);
-
+        // Test entering a metadata field with integer validation and a valid default value
+        $metadata_field = [
+            'external_id' => self::$unique_external_id_for_testing_integer_validation_2,
+            'label' => self::$unique_external_id_for_testing_integer_validation_2,
+            'type' => 'integer',
+            'default_value' => 6,
+            'validation' => $validation
+        ];
         $this->setExpectedException('\Cloudinary\Api\BadRequest');
-        $metadata_field['default_value'] = 6;
         $this->api->add_metadata_field($metadata_field);
     }
 }
