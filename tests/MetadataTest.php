@@ -129,6 +129,10 @@ class MetadataTest extends TestCase
     }
 
     /**
+     * Asserts that a given object fits the generic structure of a metadata field datasource
+     *
+     * @see https://cloudinary.com/documentation/admin_api#datasource_values
+     *
      * @param $dataSource
      */
     private function assert_metadata_field_datasource($dataSource)
@@ -143,7 +147,7 @@ class MetadataTest extends TestCase
     }
 
     /**
-     * Get metadata fields
+     * Test getting a list of all metadata fields
      *
      * @throws \Cloudinary\Api\GeneralError
      */
@@ -151,12 +155,12 @@ class MetadataTest extends TestCase
     {
         $result = $this->api->list_metadata_fields();
 
-        $this->assertNotEmpty($result['metadata_fields']);
+        $this->assertGreaterThanOrEqual(1, count($result['metadata_fields']));
         $this->assert_metadata_field($result['metadata_fields'][0]);
     }
 
     /**
-     * Get a metadata field by external id
+     * Test getting a metadata field by external id
      *
      * @throws \Cloudinary\Api\GeneralError
      */
@@ -168,7 +172,7 @@ class MetadataTest extends TestCase
     }
 
     /**
-     * Create a string metadata field
+     * Test creating a string metadata field
      *
      * @throws \Cloudinary\Api\GeneralError
      */
@@ -188,7 +192,7 @@ class MetadataTest extends TestCase
     }
 
     /**
-     * Create an int metadata field
+     * Test creating an integer metadata field
      *
      * @throws \Cloudinary\Api\GeneralError
      */
@@ -208,7 +212,7 @@ class MetadataTest extends TestCase
     }
 
     /**
-     * Create a date metadata field
+     * Test creating a date metadata field
      *
      * @throws \Cloudinary\Api\GeneralError
      */
@@ -228,7 +232,7 @@ class MetadataTest extends TestCase
     }
 
     /**
-     * Create an Enum metadata field
+     * Test creating an Enum metadata field
      *
      * @throws \Cloudinary\Api\GeneralError
      */
@@ -251,7 +255,7 @@ class MetadataTest extends TestCase
     }
 
     /**
-     * Create a set metadata field
+     * Test creating a set metadata field
      *
      * @throws \Cloudinary\Api\GeneralError
      */
@@ -280,15 +284,17 @@ class MetadataTest extends TestCase
      */
     public function test_update_metadata_field()
     {
-        $newLabel = 'updating-' . self::$unique_external_id_general;
-        $newDefaultValue = 'updating-' . self::$unique_external_id_general;
+        $newLabel = 'update_metadata_test_' . self::$unique_external_id_general;
+        $newDefaultValue = 'update_metadata_test_' . self::$unique_external_id_general;
 
+        // Call the API to update the metadata field
+        // Will also attempt to update some fields that cannot be updated (external_id and type) which will be ignored
         $result = $this->api->update_metadata_field(
             self::$unique_external_id_general,
             [
                 'external_id' => self::$unique_external_id_set,
                 'label' => $newLabel,
-                'type' => 'string',
+                'type' => 'integer',
                 'mandatory' => true,
                 'default_value' => $newDefaultValue
             ]
