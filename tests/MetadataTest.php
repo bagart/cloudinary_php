@@ -371,9 +371,7 @@ class MetadataTest extends TestCase
     }
 
     /**
-     * Deletes a metadata field definition by its external id.
-     * The field should no longer be considered a valid candidate for all other endpoints (it will not show up in the
-     * list of fields, etc).
+     * Test deleting a metadata field definition by its external id.
      *
      * @throws \Cloudinary\Api\GeneralError
      */
