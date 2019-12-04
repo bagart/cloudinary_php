@@ -103,6 +103,10 @@ class MetadataTest extends TestCase
     }
 
     /**
+     * Asserts that a given object fits the generic structure of a metadata field
+     *
+     * @see https://cloudinary.com/documentation/admin_api#generic_structure_of_a_metadata_field
+     *
      * @param $metadataField
      * @param string $type
      */
