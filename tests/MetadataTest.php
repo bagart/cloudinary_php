@@ -107,7 +107,7 @@ class MetadataTest extends TestCase
      * @param $metadataField
      * @param string $type
      */
-    private function assert_metadata_field($metadataField, $type = null)
+    private function assert_metadata_field($metadataField, $type = null, $values = array())
     {
         $this->assertInternalType('string', $metadataField['external_id']);
         if ($type) {
@@ -121,6 +121,10 @@ class MetadataTest extends TestCase
         $this->assertArrayHasKey('validation', $metadataField);
         if (in_array($metadataField['type'], ['enum', 'set'])) {
             $this->assert_metadata_field_datasource($metadataField['datasource']);
+        }
+
+        foreach ($values as $key => $value) {
+            $this->assertEquals($value, $metadataField[$key]);
         }
     }
 
@@ -160,7 +164,7 @@ class MetadataTest extends TestCase
     {
         $result = $this->api->metadata_field_by_field_id(self::$unique_external_id_general);
 
-        $this->assert_metadata_field($result, 'string');
+        $this->assert_metadata_field($result, 'string', ['label' => self::$unique_external_id_general]);
     }
 
     /**
@@ -176,10 +180,11 @@ class MetadataTest extends TestCase
             'type' => 'string'
         ]);
 
-        $this->assert_metadata_field($result, 'string');
-        $this->assertEquals(self::$unique_external_id_string, $result['label']);
-        $this->assertEquals(self::$unique_external_id_string, $result['external_id']);
-        $this->assertFalse($result['mandatory']);
+        $this->assert_metadata_field($result, 'string', [
+            'label' => self::$unique_external_id_string,
+            'external_id' => self::$unique_external_id_string,
+            'mandatory' => false
+        ]);
     }
 
     /**
@@ -195,10 +200,11 @@ class MetadataTest extends TestCase
             'type' => 'integer'
         ]);
 
-        $this->assert_metadata_field($result,'integer');
-        $this->assertEquals(self::$unique_external_id_int, $result['label']);
-        $this->assertEquals(self::$unique_external_id_int, $result['external_id']);
-        $this->assertFalse($result['mandatory']);
+        $this->assert_metadata_field($result, 'integer', [
+            'label' => self::$unique_external_id_int,
+            'external_id' => self::$unique_external_id_int,
+            'mandatory' => false
+        ]);
     }
 
     /**
@@ -214,10 +220,11 @@ class MetadataTest extends TestCase
             'type' => 'date'
         ]);
 
-        $this->assert_metadata_field($result, 'date');
-        $this->assertEquals(self::$unique_external_id_date, $result['label']);
-        $this->assertEquals(self::$unique_external_id_date, $result['external_id']);
-        $this->assertFalse($result['mandatory']);
+        $this->assert_metadata_field($result, 'date', [
+            'label' => self::$unique_external_id_date,
+            'external_id' => self::$unique_external_id_date,
+            'mandatory' => false
+        ]);
     }
 
     /**
@@ -236,10 +243,11 @@ class MetadataTest extends TestCase
             'type' => 'enum'
         ]);
 
-        $this->assert_metadata_field($result, 'enum');
-        $this->assertEquals(self::$unique_external_id_enum, $result['label']);
-        $this->assertEquals(self::$unique_external_id_enum, $result['external_id']);
-        $this->assertFalse($result['mandatory']);
+        $this->assert_metadata_field($result, 'enum', [
+            'label' => self::$unique_external_id_enum,
+            'external_id' => self::$unique_external_id_enum,
+            'mandatory' => false
+        ]);
     }
 
     /**
@@ -258,10 +266,11 @@ class MetadataTest extends TestCase
             'type' => 'set'
         ]);
 
-        $this->assert_metadata_field($result, 'set');
-        $this->assertEquals(self::$unique_external_id_set, $result['label']);
-        $this->assertEquals(self::$unique_external_id_set, $result['external_id']);
-        $this->assertFalse($result['mandatory']);
+        $this->assert_metadata_field($result, 'set', [
+            'label' => self::$unique_external_id_set,
+            'external_id' => self::$unique_external_id_set,
+            'mandatory' => false
+        ]);
     }
 
     /**
@@ -285,11 +294,12 @@ class MetadataTest extends TestCase
             ]
         );
 
-        $this->assert_metadata_field($result, 'string');
-        $this->assertEquals(self::$unique_external_id_general, $result['external_id']);
-        $this->assertEquals($newLabel, $result['label']);
-        $this->assertEquals($newDefaultValue, $result['default_value']);
-        $this->assertTrue($result['mandatory']);
+        $this->assert_metadata_field($result, 'string', [
+            'external_id' => self::$unique_external_id_general,
+            'label' => $newLabel,
+            'default_value' => $newDefaultValue,
+            'mandatory' => true,
+        ]);
     }
 
     /**
@@ -415,9 +425,10 @@ class MetadataTest extends TestCase
 
         $result = $this->api->add_metadata_field($metadata_field);
 
-        $this->assert_metadata_field($result, 'date');
-        $this->assertEquals($result['validation'], $validation);
-        $this->assertEquals($result['default_value'], $metadata_field['default_value']);
+        $this->assert_metadata_field($result, 'date', [
+            'validation' => $validation,
+            'default_value' => $metadata_field['default_value'],
+        ]);
 
         $this->api->delete_metadata_field($result['external_id']);
 
@@ -449,9 +460,10 @@ class MetadataTest extends TestCase
 
         $result = $this->api->add_metadata_field($metadata_field);
 
-        $this->assert_metadata_field($result, 'integer');
-        $this->assertEquals($result['validation'], $validation);
-        $this->assertEquals($result['default_value'], $metadata_field['default_value']);
+        $this->assert_metadata_field($result, 'integer', [
+            'validation' => $validation,
+            'default_value' => $metadata_field['default_value'],
+        ]);
 
         $this->api->delete_metadata_field($result['external_id']);
 
