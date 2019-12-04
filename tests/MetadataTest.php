@@ -112,7 +112,7 @@ class MetadataTest extends TestCase
      */
     private function assert_metadata_field($metadataField, $type = null)
     {
-        $this->assertNotEmpty($metadataField['external_id']);
+        $this->assertInternalType('string', $metadataField['external_id']);
         if ($type) {
             $this->assertEquals($type, $metadataField['type']);
         } else {
@@ -135,8 +135,9 @@ class MetadataTest extends TestCase
         $this->assertNotEmpty($dataSource);
         $this->assertArrayHasKey('values', $dataSource);
         if (!empty($values)) {
-            $this->assertArrayHasKey('value', $dataSource['values'][0]);
-            $this->assertArrayHasKey('external_id', $dataSource['values'][0]);
+            $this->assertInternalType('string', $dataSource['values'][0]['value']);
+            $this->assertInternalType('string', $dataSource['values'][0]['external_id']);
+            $this->assertContains($dataSource['values'][0]['state'], ['active', 'inactive']);
         }
     }
 
