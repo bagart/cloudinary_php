@@ -379,14 +379,8 @@ class MetadataTest extends TestCase
     {
         $this->api->delete_metadata_field(self::$unique_external_id_for_deletion);
 
-        $hasException = false;
-        try {
-            $this->api->metadata_field_by_field_id($tempMetadataFieldId);
-        } catch (NotFound $e) {
-            $hasException = true;
-        }
-
-        $this->assertTrue($hasException, "The metadata field {$tempMetadataFieldId} was not deleted");
+        $this->setExpectedException('\Cloudinary\Api\NotFound');
+        $this->api->metadata_field_by_field_id(self::$unique_external_id_for_deletion);
     }
 
     /**
@@ -450,15 +444,9 @@ class MetadataTest extends TestCase
 
         $this->api->delete_metadata_field($result['external_id']);
 
-        $hasException = false;
-        try {
-            $metadata_field['default_value'] = date('Y-m-d', time() + 60*60*24*3);
-            $this->api->add_metadata_field($metadata_field);
-        } catch (BadRequest $e) {
-            $hasException = true;
-        }
-
-        $this->assertTrue($hasException, "The metadata field with illegal value was added");
+        $this->setExpectedException('\Cloudinary\Api\BadRequest');
+        $metadata_field['default_value'] = date('Y-m-d', time() + 60*60*24*3);
+        $this->api->add_metadata_field($metadata_field);
     }
 
     /**
@@ -485,14 +473,8 @@ class MetadataTest extends TestCase
 
         $this->api->delete_metadata_field($result['external_id']);
 
-        $hasException = false;
-        try {
-            $metadata_field['default_value'] = 6;
-            $this->api->add_metadata_field($metadata_field);
-        } catch (BadRequest $e) {
-            $hasException = true;
-        }
-
-        $this->assertTrue($hasException, "The metadata field with illegal value was added");
+        $this->setExpectedException('\Cloudinary\Api\BadRequest');
+        $metadata_field['default_value'] = 6;
+        $this->api->add_metadata_field($metadata_field);
     }
 }
