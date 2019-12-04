@@ -65,6 +65,22 @@ class MetadataTest extends TestCase
                 'label' => self::$unique_external_id_general,
                 'type' => 'string'
             ]);
+            (new Api())->add_metadata_field([
+                'datasource' => [
+                    'values' => self::$datasource_multiple
+                ],
+                'external_id' => self::$unique_external_id_enum_2,
+                'label' => self::$unique_external_id_enum_2,
+                'type' => 'enum'
+            ]);
+            (new Api())->add_metadata_field([
+                'datasource' => [
+                    'values' => self::$datasource_multiple
+                ],
+                'external_id' => self::$unique_external_id_set_2,
+                'label' => self::$unique_external_id_set_2,
+                'type' => 'set'
+            ]);
         } catch (Exception $e) {
             self::fail(
                 'Exception thrown while adding metadata field in MetadataFieldsTest::setUpBeforeClass() - ' .
@@ -315,17 +331,6 @@ class MetadataTest extends TestCase
      */
     public function test_update_metadata_field_datasource()
     {
-        $result = $this->api->add_metadata_field([
-            'datasource' => [
-                'values' => self::$datasource_multiple
-            ],
-            'external_id' => self::$unique_external_id_enum_2,
-            'label' => self::$unique_external_id_enum_2,
-            'type' => 'enum'
-        ]);
-
-        $this->assert_metadata_field($result, 'enum');
-
         $result = $this->api->update_metadata_field_datasource(
             self::$unique_external_id_enum_2,
             self::$datasource_single
@@ -373,17 +378,6 @@ class MetadataTest extends TestCase
      */
     public function test_delete_metadata_field_data_source()
     {
-        $result = $this->api->add_metadata_field([
-            'datasource' => [
-                'values' => self::$datasource_multiple
-            ],
-            'external_id' => self::$unique_external_id_set_2,
-            'label' => self::$unique_external_id_set_2,
-            'type' => 'set'
-        ]);
-
-        $this->assert_metadata_field($result, 'set');
-
         $result = $this->api->delete_datasource_entries(
             self::$unique_external_id_set_2,
             [
