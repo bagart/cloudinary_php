@@ -1327,7 +1327,9 @@ namespace Cloudinary {
         }
 
         /**
-         * List all the metadata field definitions
+         * Returns a list of all metadata field definitions
+         *
+         * @see https://cloudinary.com/documentation/admin_api#get_metadata_fields
          *
          * @return \Cloudinary\Api\Response
          *
