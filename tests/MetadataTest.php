@@ -78,9 +78,6 @@ class MetadataTest extends TestCase
         $this->api = new Api();
     }
 
-    /**
-     * @throws \Cloudinary\Api\GeneralError
-     */
     public static function tearDownAfterClass()
     {
         $api = new Api();
