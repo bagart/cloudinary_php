@@ -146,8 +146,10 @@ class MetadataTest extends TestCase
      *
      * @see https://cloudinary.com/documentation/admin_api#generic_structure_of_a_metadata_field
      *
-     * @param $metadataField
-     * @param string $type
+     * @param $metadataField    The object to test
+     * @param string $type      The type of metadata field we expect
+     * @param array $values     An associative array where the key is the name of the parameter to check and the value
+     *                          is the value
      */
     private function assert_metadata_field($metadataField, $type = null, $values = array())
     {
