@@ -1486,6 +1486,30 @@ namespace Cloudinary {
         }
 
         /**
+         * Restore entries in a metadata field datasource
+         *
+         * Restores (unblocks) any previously deleted datasource entries for a specified metadata field definition.
+         * Sets the state of the entries to active.
+         *
+         * @see https://cloudinary.com/documentation/admin_api#restore_entries_in_a_metadata_field_datasource
+         *
+         * @param string $field_external_id The ID of the metadata field
+         * @param array $entries_external_ids An array of IDs of datasource entries to restore (unblock)
+         *
+         * @return \Cloudinary\Api\Response
+         *
+         * @throws \Cloudinary\Api\GeneralError
+         */
+        public function restore_metadata_field_datasource($field_external_id, array $entries_external_ids)
+        {
+            $uri = ['metadata_fields', $field_external_id, 'restore_datasource'];
+            $params['external_ids'] = $entries_external_ids;
+            $options = ['content_type' => 'application/json'];
+
+            return $this->call_api('post', $uri, $params, $options);
+        }
+
+        /**
          * The core function that performs the API call
          *
          * Function validates configuration, builds query string/request body, performs request and returns result

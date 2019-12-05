@@ -33,6 +33,12 @@ class MetadataTest extends TestCase
             'external_id' => 'externalId1',
         ]
     ];
+    private static $datasource_single_modify = [
+        [
+            'value' => 'value_modify',
+            'external_id' => 'externalId1',
+        ]
+    ];
     private static $datasource_multiple = [
         [
             'value' => 'v2',
@@ -510,5 +516,28 @@ class MetadataTest extends TestCase
         ];
         $this->setExpectedException('\Cloudinary\Api\BadRequest');
         $this->api->add_metadata_field($metadata_field);
+    }
+
+    /**
+     * @throws \Cloudinary\Api\GeneralError
+     */
+    public function test_restore_metadata_field_datasource()
+    {
+        $this->markTestIncomplete('The method restore_metadata_field_datasource() return 404 error');
+
+        $this->api->update_metadata_field_datasource(
+            self::$unique_external_id_enum_2,
+            self::$datasource_single
+        );
+        $this->api->update_metadata_field_datasource(
+            self::$unique_external_id_enum_2,
+            self::$datasource_single_modify
+        );
+        $this->api->restore_metadata_field_datasource(
+            self::$unique_external_id_enum_2,
+            [
+                self::$datasource_single[0]['external_id']
+            ]
+        );
     }
 }
