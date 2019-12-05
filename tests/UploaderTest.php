@@ -3,6 +3,8 @@
 namespace Cloudinary {
 
     use Cloudinary;
+    use Cloudinary\Api\GeneralError;
+    use Cloudinary\Api\NotFound;
     use Cloudinary\Cache\Adapter\KeyValueCacheAdapter;
     use Cloudinary\Cache\ResponsiveBreakpointsCache;
     use Cloudinary\Test\Cache\Storage\DummyCacheStorage;
@@ -23,8 +25,31 @@ namespace Cloudinary {
         protected static $rbp_values = [206, 50];
         protected static $rbp_params;
 
+        private static $unique_external_id_string;
+        private static $metadata;
+
         public static function setUpBeforeClass()
         {
+            Cloudinary::reset_config();
+
+            self::$unique_external_id_string = 'metadata_field_external_id_' . UNIQUE_TEST_TAG;
+            self::$metadata = [
+                self::$unique_external_id_string => 'metadata_field_value_' . UNIQUE_TEST_TAG
+            ];
+
+            try {
+                (new Cloudinary\Api())->add_metadata_field([
+                    'external_id' => self::$unique_external_id_string,
+                    'label' => self::$unique_external_id_string,
+                    'type' => 'string'
+                ]);
+            } catch (GeneralError $e) {
+                self::fail(
+                    'Exception thrown while adding metadata field in UploaderTest::setUpBeforeClass() - ' .
+                    $e->getMessage()
+                );
+            }
+
             Curl::$instance = new Curl();
 
             self::$rbp_params = [
@@ -65,6 +90,9 @@ namespace Cloudinary {
             Curl::$instance = new Curl();
         }
 
+        /**
+         * @throws \Cloudinary\Api\GeneralError
+         */
         public static function tearDownAfterClass()
         {
             if (!Cloudinary::config_get("api_secret")) {
@@ -72,6 +100,12 @@ namespace Cloudinary {
             }
 
             $api = new Cloudinary\Api();
+
+            try {
+                $api->delete_metadata_field(self::$unique_external_id_string);
+            } catch (NotFound $e) {
+                printf("The metadata field '%s' has not been deleted.\n", self::$unique_external_id_string);
+            }
 
             self::delete_resources($api);
         }
@@ -855,6 +889,85 @@ TAG
             }
 
             $this->assertEquals(2, count($response["image_infos"]));
+        }
+
+        /**
+         * Upload should supported `metadata` parameter
+         */
+        public function test_upload_with_metadata()
+        {
+            $result = Uploader::upload(
+                TEST_IMG,
+                [
+                    'tags' => array(TEST_TAG, UNIQUE_TEST_TAG),
+                    'metadata' => self::$metadata
+                ]
+            );
+            $this->assertEquals(self::$metadata[self::$unique_external_id_string], $result['metadata'][self::$unique_external_id_string]);
+        }
+
+        /**
+         * Explicit should supported `metadata` parameter
+         */
+        public function test_explicit_with_metadata()
+        {
+            $resource = Uploader::upload(TEST_IMG, [
+                "tags" => [TEST_TAG, UNIQUE_TEST_TAG],
+            ]);
+            $result = Uploader::explicit(
+                $resource['public_id'],
+                [
+                    'type' => 'upload',
+                    'eager' => self::$rbp_trans,
+                    'metadata' => self::$metadata
+                ]
+            );
+            $this->assertEquals(self::$metadata[self::$unique_external_id_string], $result['metadata'][self::$unique_external_id_string]);
+        }
+
+        /**
+         * Editing metadata of an existing resource
+         *
+         * @throws \Cloudinary\Error
+         */
+        public function test_uploader_update_metadata()
+        {
+            $resource = Uploader::upload(TEST_IMG, [
+                'tags' => [TEST_TAG, UNIQUE_TEST_TAG]
+            ]);
+            $result = Uploader::update_metadata(
+                self::$metadata,
+                [
+                    $resource['public_id']
+                ]
+            );
+            $this->assertCount(1, $result['public_ids']);
+            $this->assertContains($resource['public_id'], $result['public_ids']);
+        }
+
+        /**
+         * Editing metadata of some existing resource
+         *
+         * @throws \Cloudinary\Error
+         */
+        public function test_uploader_update_some_resources_metadata()
+        {
+            $resource1 = Uploader::upload(TEST_IMG, [
+                'tags' => [TEST_TAG, UNIQUE_TEST_TAG]
+            ]);
+            $resource2 = Uploader::upload(TEST_IMG, [
+                'tags' => [TEST_TAG, UNIQUE_TEST_TAG]
+            ]);
+            $result = Uploader::update_metadata(
+                self::$metadata,
+                [
+                    $resource1['public_id'],
+                    $resource2['public_id']
+                ]
+            );
+            $this->assertCount(2, $result['public_ids']);
+            $this->assertContains($resource1['public_id'], $result['public_ids']);
+            $this->assertContains($resource2['public_id'], $result['public_ids']);
         }
     }
 }
