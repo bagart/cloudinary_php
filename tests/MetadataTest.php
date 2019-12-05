@@ -27,30 +27,12 @@ class MetadataTest extends TestCase
     private static $unique_external_id_for_testing_date_validation_2;
     private static $unique_external_id_for_testing_integer_validation;
     private static $unique_external_id_for_testing_integer_validation_2;
-    private static $datasource_single = [
-        [
-            'value' => 'v1',
-            'external_id' => 'externalId1',
-        ]
-    ];
-    private static $datasource_single_modify = [
-        [
-            'value' => 'value_modify',
-            'external_id' => 'externalId1',
-        ]
-    ];
-    private static $datasource_multiple = [
-        [
-            'value' => 'v2',
-            'external_id' => 'externalId1',
-        ],
-        [
-            'value' => 'v3'
-        ],
-        [
-            'value' => 'v4'
-        ],
-    ];
+    private static $unique_datasource_external_id_for_testing_datasource;
+    private static $unique_datasource_external_id_for_testing_restore_datasource;
+    private static $datasource_single;
+    private static $datasource_multiple;
+    private static $datasource_single_first;
+    private static $datasource_single_modify;
 
     /**
      * @var  \Cloudinary\Api $api
@@ -75,6 +57,39 @@ class MetadataTest extends TestCase
         self::$unique_external_id_for_testing_date_validation_2 = 'metadata_date_validation_test_2_' . UNIQUE_TEST_ID;
         self::$unique_external_id_for_testing_integer_validation = 'metadata_integer_validation_test_' . UNIQUE_TEST_ID;
         self::$unique_external_id_for_testing_integer_validation_2 = 'metadata_integer_validation_test_2_' . UNIQUE_TEST_ID;
+        self::$unique_datasource_external_id_for_testing_datasource = 'metadata_datasource_external_id' . UNIQUE_TEST_ID;
+        self::$unique_datasource_external_id_for_testing_restore_datasource = 'metadata_datasource_restore_external_id' . UNIQUE_TEST_ID;
+        self::$datasource_single_first = [
+            [
+                'value' => 'value',
+                'external_id' => self::$unique_datasource_external_id_for_testing_restore_datasource,
+            ]
+        ];
+        self::$datasource_single_modify = [
+            [
+                'value' => 'value_modify',
+                'external_id' => self::$unique_datasource_external_id_for_testing_restore_datasource,
+            ]
+        ];
+        self::$datasource_single = [
+            [
+                'value' => 'v1',
+                'external_id' => self::$unique_datasource_external_id_for_testing_datasource,
+            ]
+        ];
+        self::$datasource_multiple = [
+            [
+                'value' => 'v2',
+                'external_id' => self::$unique_datasource_external_id_for_testing_datasource,
+            ],
+            [
+                'value' => 'v3'
+            ],
+            [
+                'value' => 'v4'
+            ],
+        ];
+
         try {
             (new Api())->add_metadata_field([
                 'external_id' => self::$unique_external_id_general,
@@ -411,7 +426,7 @@ class MetadataTest extends TestCase
         $result = $this->api->delete_datasource_entries(
             self::$unique_external_id_set_2,
             [
-                self::$datasource_multiple[0]['external_id']
+                self::$unique_datasource_external_id_for_testing_datasource
             ]
         );
 
@@ -527,7 +542,7 @@ class MetadataTest extends TestCase
 
         $this->api->update_metadata_field_datasource(
             self::$unique_external_id_enum_2,
-            self::$datasource_single
+            self::$datasource_single_first
         );
         $this->api->update_metadata_field_datasource(
             self::$unique_external_id_enum_2,
@@ -536,7 +551,7 @@ class MetadataTest extends TestCase
         $this->api->restore_metadata_field_datasource(
             self::$unique_external_id_enum_2,
             [
-                self::$datasource_single[0]['external_id']
+                self::$unique_datasource_external_id_for_testing_restore_datasource
             ]
         );
     }
