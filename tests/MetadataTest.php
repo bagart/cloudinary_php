@@ -56,19 +56,19 @@ class MetadataTest extends TestCase
         if (!Cloudinary::config_get("api_secret")) {
             self::markTestSkipped('Please setup environment for Api test to run');
         }
-        self::$unique_external_id_general = 'metadata_external_id_general_' . UNIQUE_TEST_TAG;
-        self::$unique_external_id_string = 'metadata_external_id_string_' . UNIQUE_TEST_TAG;
-        self::$unique_external_id_int = 'metadata_external_id_int_' . UNIQUE_TEST_TAG;
-        self::$unique_external_id_date = 'metadata_external_id_date_' . UNIQUE_TEST_TAG;
-        self::$unique_external_id_enum = 'metadata_external_id_enum_' . UNIQUE_TEST_TAG;
-        self::$unique_external_id_enum_2 = 'metadata_external_id_enum_2_' . UNIQUE_TEST_TAG;
-        self::$unique_external_id_set = 'metadata_external_id_set_' . UNIQUE_TEST_TAG;
-        self::$unique_external_id_set_2 = 'metadata_external_id_set_2_' . UNIQUE_TEST_TAG;
-        self::$unique_external_id_for_deletion = 'metadata_deletion_test_' . UNIQUE_TEST_TAG;
-        self::$unique_external_id_for_testing_date_validation = 'metadata_date_validation_test_' . UNIQUE_TEST_TAG;
-        self::$unique_external_id_for_testing_date_validation_2 = 'metadata_date_validation_test_2_' . UNIQUE_TEST_TAG;
-        self::$unique_external_id_for_testing_integer_validation = 'metadata_integer_validation_test_' . UNIQUE_TEST_TAG;
-        self::$unique_external_id_for_testing_integer_validation_2 = 'metadata_integer_validation_test_2_' . UNIQUE_TEST_TAG;
+        self::$unique_external_id_general = 'metadata_external_id_general_' . UNIQUE_TEST_ID;
+        self::$unique_external_id_string = 'metadata_external_id_string_' . UNIQUE_TEST_ID;
+        self::$unique_external_id_int = 'metadata_external_id_int_' . UNIQUE_TEST_ID;
+        self::$unique_external_id_date = 'metadata_external_id_date_' . UNIQUE_TEST_ID;
+        self::$unique_external_id_enum = 'metadata_external_id_enum_' . UNIQUE_TEST_ID;
+        self::$unique_external_id_enum_2 = 'metadata_external_id_enum_2_' . UNIQUE_TEST_ID;
+        self::$unique_external_id_set = 'metadata_external_id_set_' . UNIQUE_TEST_ID;
+        self::$unique_external_id_set_2 = 'metadata_external_id_set_2_' . UNIQUE_TEST_ID;
+        self::$unique_external_id_for_deletion = 'metadata_deletion_test_' . UNIQUE_TEST_ID;
+        self::$unique_external_id_for_testing_date_validation = 'metadata_date_validation_test_' . UNIQUE_TEST_ID;
+        self::$unique_external_id_for_testing_date_validation_2 = 'metadata_date_validation_test_2_' . UNIQUE_TEST_ID;
+        self::$unique_external_id_for_testing_integer_validation = 'metadata_integer_validation_test_' . UNIQUE_TEST_ID;
+        self::$unique_external_id_for_testing_integer_validation_2 = 'metadata_integer_validation_test_2_' . UNIQUE_TEST_ID;
         try {
             (new Api())->add_metadata_field([
                 'external_id' => self::$unique_external_id_general,
