@@ -25,22 +25,24 @@ namespace Cloudinary {
         protected static $rbp_values = [206, 50];
         protected static $rbp_params;
 
-        private static $unique_external_id_string;
-        private static $metadata;
+        private static $metadata_field_unique_external_id;
+        private static $metadata_field_value;
+        private static $metadata_fields;
 
         public static function setUpBeforeClass()
         {
             Cloudinary::reset_config();
 
-            self::$unique_external_id_string = 'metadata_field_external_id_' . UNIQUE_TEST_TAG;
-            self::$metadata = [
-                self::$unique_external_id_string => 'metadata_field_value_' . UNIQUE_TEST_TAG
+            self::$metadata_field_unique_external_id = 'metadata_field_external_id_' . UNIQUE_TEST_ID;
+            self::$metadata_field_value = 'metadata_field_value_' . UNIQUE_TEST_ID;
+            self::$metadata_fields = [
+                self::$metadata_field_unique_external_id => self::$metadata_field_value
             ];
 
             try {
                 (new Cloudinary\Api())->add_metadata_field([
-                    'external_id' => self::$unique_external_id_string,
-                    'label' => self::$unique_external_id_string,
+                    'external_id' => self::$metadata_field_unique_external_id,
+                    'label' => self::$metadata_field_unique_external_id,
                     'type' => 'string'
                 ]);
             } catch (GeneralError $e) {
@@ -102,9 +104,9 @@ namespace Cloudinary {
             $api = new Cloudinary\Api();
 
             try {
-                $api->delete_metadata_field(self::$unique_external_id_string);
+                $api->delete_metadata_field(self::$metadata_field_unique_external_id);
             } catch (NotFound $e) {
-                printf("The metadata field '%s' has not been deleted.\n", self::$unique_external_id_string);
+                printf("The metadata field '%s' could not be deleted.\n", self::$metadata_field_unique_external_id);
             }
 
             self::delete_resources($api);
@@ -900,10 +902,10 @@ TAG
                 TEST_IMG,
                 [
                     'tags' => array(TEST_TAG, UNIQUE_TEST_TAG),
-                    'metadata' => self::$metadata
+                    'metadata' => self::$metadata_fields
                 ]
             );
-            $this->assertEquals(self::$metadata[self::$unique_external_id_string], $result['metadata'][self::$unique_external_id_string]);
+            $this->assertEquals(self::$metadata_field_value, $result['metadata'][self::$metadata_field_unique_external_id]);
         }
 
         /**
@@ -919,10 +921,10 @@ TAG
                 [
                     'type' => 'upload',
                     'eager' => self::$rbp_trans,
-                    'metadata' => self::$metadata
+                    'metadata' => self::$metadata_fields
                 ]
             );
-            $this->assertEquals(self::$metadata[self::$unique_external_id_string], $result['metadata'][self::$unique_external_id_string]);
+            $this->assertEquals(self::$metadata_field_value, $result['metadata'][self::$metadata_field_unique_external_id]);
         }
 
         /**
@@ -936,7 +938,7 @@ TAG
                 'tags' => [TEST_TAG, UNIQUE_TEST_TAG]
             ]);
             $result = Uploader::update_metadata(
-                self::$metadata,
+                self::$metadata_fields,
                 [
                     $resource['public_id']
                 ]
@@ -946,11 +948,11 @@ TAG
         }
 
         /**
-         * Editing metadata of some existing resource
+         * Editing metadata of multiple existing resources
          *
          * @throws \Cloudinary\Error
          */
-        public function test_uploader_update_some_resources_metadata()
+        public function test_uploader_update_multiple_resources_metadata()
         {
             $resource1 = Uploader::upload(TEST_IMG, [
                 'tags' => [TEST_TAG, UNIQUE_TEST_TAG]
@@ -959,7 +961,7 @@ TAG
                 'tags' => [TEST_TAG, UNIQUE_TEST_TAG]
             ]);
             $result = Uploader::update_metadata(
-                self::$metadata,
+                self::$metadata_fields,
                 [
                     $resource1['public_id'],
                     $resource2['public_id']
