@@ -20,17 +20,15 @@ class MetadataTest extends TestCase
     private static $unique_external_id_enum_2;
     private static $unique_external_id_set;
     private static $unique_external_id_set_2;
+    private static $unique_external_id_set_3;
     private static $unique_external_id_for_deletion;
     private static $unique_external_id_for_testing_date_validation;
     private static $unique_external_id_for_testing_date_validation_2;
     private static $unique_external_id_for_testing_integer_validation;
     private static $unique_external_id_for_testing_integer_validation_2;
-    private static $unique_datasource_external_id_for_testing_datasource;
-    private static $unique_datasource_external_id_for_testing_restore_datasource;
+    private static $unique_datasource_entry_external_id;
     private static $datasource_single;
     private static $datasource_multiple;
-    private static $datasource_single_first;
-    private static $datasource_single_modify;
 
     /**
      * @var  \Cloudinary\Api $api
@@ -50,35 +48,23 @@ class MetadataTest extends TestCase
         self::$unique_external_id_enum_2 = 'metadata_external_id_enum_2_' . UNIQUE_TEST_ID;
         self::$unique_external_id_set = 'metadata_external_id_set_' . UNIQUE_TEST_ID;
         self::$unique_external_id_set_2 = 'metadata_external_id_set_2_' . UNIQUE_TEST_ID;
+        self::$unique_external_id_set_3 = 'metadata_external_id_set_3_' . UNIQUE_TEST_ID;
         self::$unique_external_id_for_deletion = 'metadata_deletion_test_' . UNIQUE_TEST_ID;
         self::$unique_external_id_for_testing_date_validation = 'metadata_date_validation_test_' . UNIQUE_TEST_ID;
         self::$unique_external_id_for_testing_date_validation_2 = 'metadata_date_validation_test_2_' . UNIQUE_TEST_ID;
         self::$unique_external_id_for_testing_integer_validation = 'metadata_integer_validation_test_' . UNIQUE_TEST_ID;
         self::$unique_external_id_for_testing_integer_validation_2 = 'metadata_integer_validation_test_2_' . UNIQUE_TEST_ID;
-        self::$unique_datasource_external_id_for_testing_datasource = 'metadata_datasource_external_id' . UNIQUE_TEST_ID;
-        self::$unique_datasource_external_id_for_testing_restore_datasource = 'metadata_datasource_restore_external_id' . UNIQUE_TEST_ID;
-        self::$datasource_single_first = [
-            [
-                'value' => 'value',
-                'external_id' => self::$unique_datasource_external_id_for_testing_restore_datasource,
-            ]
-        ];
-        self::$datasource_single_modify = [
-            [
-                'value' => 'value_modify',
-                'external_id' => self::$unique_datasource_external_id_for_testing_restore_datasource,
-            ]
-        ];
+        self::$unique_datasource_entry_external_id = 'metadata_datasource_entry_external_id' . UNIQUE_TEST_ID;
         self::$datasource_single = [
             [
                 'value' => 'v1',
-                'external_id' => self::$unique_datasource_external_id_for_testing_datasource,
+                'external_id' => self::$unique_datasource_entry_external_id,
             ]
         ];
         self::$datasource_multiple = [
             [
                 'value' => 'v2',
-                'external_id' => self::$unique_datasource_external_id_for_testing_datasource,
+                'external_id' => self::$unique_datasource_entry_external_id,
             ],
             [
                 'value' => 'v3'
@@ -108,6 +94,14 @@ class MetadataTest extends TestCase
                 ],
                 'external_id' => self::$unique_external_id_set_2,
                 'label' => self::$unique_external_id_set_2,
+                'type' => 'set'
+            ]);
+            (new Api())->add_metadata_field([
+                'datasource' => [
+                    'values' => self::$datasource_multiple
+                ],
+                'external_id' => self::$unique_external_id_set_3,
+                'label' => self::$unique_external_id_set_3,
                 'type' => 'set'
             ]);
             (new Api())->add_metadata_field([
@@ -141,6 +135,7 @@ class MetadataTest extends TestCase
             $api->delete_metadata_field(self::$unique_external_id_enum_2);
             $api->delete_metadata_field(self::$unique_external_id_set);
             $api->delete_metadata_field(self::$unique_external_id_set_2);
+            $api->delete_metadata_field(self::$unique_external_id_set_3);
             $api->delete_metadata_field(self::$unique_external_id_for_testing_date_validation);
             $api->delete_metadata_field(self::$unique_external_id_for_testing_integer_validation);
         } catch (Exception $e) {
@@ -424,7 +419,7 @@ class MetadataTest extends TestCase
         $result = $this->api->delete_datasource_entries(
             self::$unique_external_id_set_2,
             [
-                self::$unique_datasource_external_id_for_testing_datasource
+                self::$unique_datasource_entry_external_id
             ]
         );
 
@@ -534,25 +529,31 @@ class MetadataTest extends TestCase
     }
 
     /**
+     * Restore a deleted entry in a metadata field datasource
+     *
      * @throws \Cloudinary\Api\GeneralError
      */
     public function test_restore_metadata_field_datasource()
     {
-        $this->markTestIncomplete('The method restore_metadata_field_datasource() return 404 error');
-
-        $this->api->update_metadata_field_datasource(
-            self::$unique_external_id_enum_2,
-            self::$datasource_single_first
-        );
-        $this->api->update_metadata_field_datasource(
-            self::$unique_external_id_enum_2,
-            self::$datasource_single_modify
-        );
-        $this->api->restore_metadata_field_datasource(
-            self::$unique_external_id_enum_2,
+        // Begin by deleting a datasource entry
+        $result = $this->api->delete_datasource_entries(
+            self::$unique_external_id_set_3,
             [
-                self::$unique_datasource_external_id_for_testing_restore_datasource
+                self::$unique_datasource_entry_external_id
             ]
         );
+
+        $this->assert_metadata_field_datasource($result);
+        $this->assertCount(2, $result['values']);
+
+        // Restore datasource entry
+        $result = $this->api->restore_metadata_field_datasource(
+            self::$unique_external_id_set_3,
+            [
+                self::$unique_datasource_entry_external_id
+            ]
+        );
+        $this->assert_metadata_field_datasource($result);
+        $this->assertCount(3, $result['values']);
     }
 }
