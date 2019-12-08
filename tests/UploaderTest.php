@@ -936,12 +936,7 @@ TAG
             $resource = Uploader::upload(TEST_IMG, [
                 'tags' => [TEST_TAG, UNIQUE_TEST_TAG]
             ]);
-            $result = Uploader::update_metadata(
-                self::$metadata_fields,
-                [
-                    $resource['public_id']
-                ]
-            );
+            $result = Uploader::update_metadata(self::$metadata_fields, $resource['public_id']);
             $this->assertCount(1, $result['public_ids']);
             $this->assertContains($resource['public_id'], $result['public_ids']);
         }
@@ -951,7 +946,7 @@ TAG
          *
          * @throws \Cloudinary\Error
          */
-        public function test_uploader_update_multiple_resources_metadata()
+        public function test_uploader_update_metadata_on_multiple_resources()
         {
             $resource1 = Uploader::upload(TEST_IMG, [
                 'tags' => [TEST_TAG, UNIQUE_TEST_TAG]
