@@ -5,8 +5,6 @@ namespace Cloudinary;
 use Exception;
 use Cloudinary;
 use PHPUnit\Framework\TestCase;
-use Cloudinary\Api\NotFound;
-use Cloudinary\Api\BadRequest;
 
 /**
  * Class MetadataTest
