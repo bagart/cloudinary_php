@@ -920,7 +920,6 @@ TAG
                 $resource['public_id'],
                 [
                     'type' => 'upload',
-                    'eager' => self::$rbp_trans,
                     'metadata' => self::$metadata_fields
                 ]
             );
