@@ -1502,7 +1502,7 @@ namespace Cloudinary {
          */
         public function restore_metadata_field_datasource($field_external_id, array $entries_external_ids)
         {
-            $uri = ['metadata_fields', $field_external_id, 'restore_datasource'];
+            $uri = ['metadata_fields', $field_external_id, 'datasource_restore'];
             $params['external_ids'] = $entries_external_ids;
             $options = ['content_type' => 'application/json'];
 
